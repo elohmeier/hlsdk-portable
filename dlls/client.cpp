@@ -40,6 +40,10 @@
 #include "netadr.h"
 #include "pm_shared.h"
 
+#ifdef HL64_JOURNAL
+#include "hl64_journal.h"
+#endif
+
 extern DLL_GLOBAL ULONG		g_ulModelIndexPlayer;
 extern DLL_GLOBAL BOOL		g_fGameOver;
 extern DLL_GLOBAL int		g_iSkillLevel;
@@ -532,6 +536,27 @@ void ClientCommand( edict_t *pEntity )
 			}
 		}
 	}
+	else if( FStrEq( pcmd, "hl64_setpos" ) )
+	{
+		if( g_enable_cheats->value != 0 && CMD_ARGC() >= 4 )
+		{
+			Vector origin(
+				atof( CMD_ARGV( 1 ) ),
+				atof( CMD_ARGV( 2 ) ),
+				atof( CMD_ARGV( 3 ) ) );
+			UTIL_SetOrigin( pev, origin );
+			pev->velocity = g_vecZero;
+			pev->basevelocity = g_vecZero;
+			if( CMD_ARGC() >= 6 )
+			{
+				pev->v_angle.x = atof( CMD_ARGV( 5 ) );
+				pev->v_angle.y = atof( CMD_ARGV( 4 ) );
+				pev->v_angle.z = 0;
+				pev->angles = pev->v_angle;
+				pev->fixangle = TRUE;
+			}
+		}
+	}
 	else if( FStrEq( pcmd, "drop" ) )
 	{
 		// player is dropping an item. 
@@ -820,6 +845,9 @@ void StartFrame( void )
 
 	gpGlobals->teamplay = teamplay.value;
 	g_ulFrameCount++;
+#ifdef HL64_JOURNAL
+	HL64_JournalFrame();
+#endif
 }
 
 void ClientPrecache( void )

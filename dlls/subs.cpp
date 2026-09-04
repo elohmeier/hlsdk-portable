@@ -27,6 +27,10 @@
 #include "nodes.h"
 #include "doors.h"
 
+#ifdef HL64_JOURNAL
+#include "hl64_journal.h"
+#endif
+
 extern CGraph WorldGraph;
 
 extern BOOL FEntIsVisible( entvars_t *pev, entvars_t *pevTarget );
@@ -188,6 +192,9 @@ void FireTargets( const char *targetName, CBaseEntity *pActivator, CBaseEntity *
 		return;
 
 	ALERT( at_aiconsole, "Firing: (%s)\n", targetName );
+#ifdef HL64_JOURNAL
+	HL64_JournalFireTargets( targetName, pActivator, pCaller, useType, value );
+#endif
 
 	for( ; ; )
 	{

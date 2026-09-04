@@ -37,6 +37,11 @@ def build(bld):
 	else:
 		defines += ['NO_VOICEGAMEMGR']
 
+	# hl64 local diagnostic instrumentation (hl64_journal.cpp); the hl64
+	# oracle's CMake build never defines this and keeps its explicit source
+	# list, so the guarded call sites compile out there.
+	defines = defines + ['HL64_JOURNAL']
+
 	includes = [
 		'.',
 		'../common',

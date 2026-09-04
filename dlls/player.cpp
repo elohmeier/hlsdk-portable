@@ -37,6 +37,10 @@
 #include "pm_shared.h"
 #include "hltv.h"
 
+#ifdef HL64_JOURNAL
+#include "hl64_journal.h"
+#endif
+
 // #define DUCKFIX
 
 extern DLL_GLOBAL ULONG g_ulModelIndexPlayer;
@@ -1618,11 +1622,17 @@ void CBasePlayer::PlayerUse( void )
 			if( caps & FCAP_CONTINUOUS_USE )
 				m_afPhysicsFlags |= PFLAG_USING;
 
+#ifdef HL64_JOURNAL
+			HL64_JournalPlayerUse( pObject, 1.0f );
+#endif
 			pObject->Use( this, this, USE_SET, 1 );
 		}
 		// UNDONE: Send different USE codes for ON/OFF.  Cache last ONOFF_USE object to send 'off' if you turn away
 		else if( ( m_afButtonReleased & IN_USE ) && ( pObject->ObjectCaps() & FCAP_ONOFF_USE ) )	// BUGBUG This is an "off" use
 		{
+#ifdef HL64_JOURNAL
+			HL64_JournalPlayerUse( pObject, 0.0f );
+#endif
 			pObject->Use( this, this, USE_SET, 0 );
 		}
 	}
