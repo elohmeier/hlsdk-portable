@@ -28,6 +28,10 @@
 #include "trains.h"			// trigger_camera has train functionality
 #include "gamerules.h"
 
+#ifdef HL64_JOURNAL
+#include "hl64_journal.h"
+#endif
+
 #define	SF_TRIGGER_PUSH_START_OFF	2//spawnflag that makes trigger_push spawn turned OFF
 #define SF_TRIGGER_HURT_TARGETONCE	1// Only fire hurt target once
 #define	SF_TRIGGER_HURT_START_OFF	2//spawnflag that makes trigger_push spawn turned OFF
@@ -1941,6 +1945,10 @@ void CTriggerSave::SaveTouch( CBaseEntity *pOther )
 	// Only save on clients
 	if( !pOther->IsPlayer() )
 		return;
+
+#ifdef HL64_JOURNAL
+	HL64_JournalAutosave( this, pOther );
+#endif
 
 	SetTouch( NULL );
 	UTIL_Remove( this );

@@ -40,7 +40,7 @@ static FILE *JournalHandle( void )
 		return NULL;
 	}
 	fprintf( g_journal,
-		"{\"t\":%.6f,\"event\":\"session_start\",\"journal_version\":1}\n",
+		"{\"t\":%.6f,\"event\":\"session_start\",\"journal_version\":2}\n",
 		gpGlobals->time );
 	fflush( g_journal );
 	return g_journal;
@@ -179,6 +179,54 @@ void HL64_JournalPlayerUse( CBaseEntity *pObject, float value )
 	fprintf( f, "{\"t\":%.6f,\"event\":\"use\",\"value\":%.1f",
 		gpGlobals->time, value );
 	JournalEntityFields( f, "target", pObject );
+	fputs( "}\n", f );
+	fflush( f );
+}
+
+void HL64_JournalPlayerDamage( CBaseEntity *pPlayer,
+			       entvars_t *pevInflictor, entvars_t *pevAttacker,
+			       float requested, float healthBefore,
+			       float armorBefore, int bitsDamageType )
+{
+	FILE *f = JournalHandle();
+	if( !f || !pPlayer )
+		return;
+	JournalMapBoundary( f );
+	fprintf( f,
+		"{\"t\":%.6f,\"event\":\"damage\",\"requested\":%.3f,"
+		"\"health_before\":%.3f,\"health_after\":%.3f,"
+		"\"armor_before\":%.3f,\"armor_after\":%.3f,"
+		"\"applied\":%.3f,\"damage_type\":%d",
+		gpGlobals->time, requested,
+		healthBefore, pPlayer->pev->health,
+		armorBefore, pPlayer->pev->armorvalue,
+		healthBefore - pPlayer->pev->health, bitsDamageType );
+	JournalEntityFields( f, "victim", pPlayer );
+	JournalEntityFields( f, "inflictor",
+		pevInflictor ? CBaseEntity::Instance( pevInflictor ) : NULL );
+	JournalEntityFields( f, "attacker",
+		pevAttacker ? CBaseEntity::Instance( pevAttacker ) : NULL );
+	fputs( "}\n", f );
+	fflush( f );
+}
+
+void HL64_JournalAutosave( CBaseEntity *pTrigger, CBaseEntity *pPlayer )
+{
+	FILE *f = JournalHandle();
+	if( !f || !pTrigger || !pPlayer )
+		return;
+	JournalMapBoundary( f );
+	fprintf( f,
+		"{\"t\":%.6f,\"event\":\"autosave\","
+		"\"mins\":[%.3f,%.3f,%.3f],"
+		"\"maxs\":[%.3f,%.3f,%.3f]",
+		gpGlobals->time,
+		pTrigger->pev->absmin.x, pTrigger->pev->absmin.y,
+		pTrigger->pev->absmin.z,
+		pTrigger->pev->absmax.x, pTrigger->pev->absmax.y,
+		pTrigger->pev->absmax.z );
+	JournalEntityFields( f, "trigger", pTrigger );
+	JournalEntityFields( f, "activator", pPlayer );
 	fputs( "}\n", f );
 	fflush( f );
 }

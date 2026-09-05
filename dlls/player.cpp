@@ -439,6 +439,8 @@ int CBasePlayer::TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, fl
 	float flRatio;
 	float flBonus;
 	float flHealthPrev = pev->health;
+	float flArmorPrev = pev->armorvalue;
+	float flDamageRequested = flDamage;
 
 	flBonus = ARMOR_BONUS;
 	flRatio = ARMOR_RATIO;
@@ -491,6 +493,12 @@ int CBasePlayer::TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, fl
 	// this cast to INT is critical!!! If a player ends up with 0.5 health, the engine will get that
 	// as an int (zero) and think the player is dead! (this will incite a clientside screentilt, etc)
 	fTookDamage = CBaseMonster::TakeDamage( pevInflictor, pevAttacker, flDamage >= 0.0f ? floor(flDamage) : ceil(flDamage), bitsDamageType );
+
+#ifdef HL64_JOURNAL
+	if( fTookDamage )
+		HL64_JournalPlayerDamage( this, pevInflictor, pevAttacker,
+			flDamageRequested, flHealthPrev, flArmorPrev, bitsDamageType );
+#endif
 
 	// reset damage time countdown for each type of time based damage player just sustained
 	{

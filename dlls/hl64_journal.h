@@ -13,4 +13,9 @@ void HL64_JournalFrame( void );
 void HL64_JournalFireTargets( const char *targetName, CBaseEntity *pActivator,
 			      CBaseEntity *pCaller, USE_TYPE useType, float value );
 void HL64_JournalPlayerUse( CBaseEntity *pObject, float value );
+void HL64_JournalPlayerDamage( CBaseEntity *pPlayer,
+			       entvars_t *pevInflictor, entvars_t *pevAttacker,
+			       float requested, float healthBefore,
+			       float armorBefore, int bitsDamageType );
+void HL64_JournalAutosave( CBaseEntity *pTrigger, CBaseEntity *pPlayer );
 #endif
